@@ -1,0 +1,15 @@
+# helm install monitoring prometheus-community/kube-prometheus-stack -n monitoring -f this file
+grafana:
+  adminPassword: admin
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      searchNamespace: ALL
+prometheus:
+  prometheusSpec:
+    # pick up ServiceMonitors from every release, not only this chart's
+    serviceMonitorSelectorNilUsesHelmValues: false
+    retention: 7d
+alertmanager:
+  enabled: false

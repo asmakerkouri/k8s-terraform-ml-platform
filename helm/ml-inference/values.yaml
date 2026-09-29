@@ -1,0 +1,55 @@
+replicaCount: 2
+
+image:
+  # Built and pushed by github.com/asmakerkouri/mlops-yolo-fastapi
+  repository: mlops-yolo-fastapi
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+env:
+  MODEL_VERSION: "1.0.0"
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+ingress:
+  enabled: false
+  className: nginx
+  host: inference.local
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Requires the Prometheus Operator CRDs (kube-prometheus-stack)
+serviceMonitor:
+  enabled: false
+  interval: 15s
+  labels:
+    release: monitoring
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop: ["ALL"]
